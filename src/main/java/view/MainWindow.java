@@ -5,23 +5,17 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URL;
-import java.util.Arrays;
-
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
-import model.FieldValue;
+import model.Minesweeper;
 import model.Move;
 import model.State;
 import model.difficulty.Advanced;
@@ -36,13 +30,8 @@ public class MainWindow extends JFrame {
     private JPanel boardPanel;
     private JPanel bottomPanel;
 
-    private Square[][] squares;
+    private Minesweeper mineField;
     private JLabel lNumBombs;
-
-    private int rows;
-    private int cols;
-    private int bombs;
-    private Move lastMove;
 
     public MainWindow() {
         super("Minesweeper");
@@ -50,10 +39,9 @@ public class MainWindow extends JFrame {
 
     private void newGame(JComboBox<Difficulty> cbDifficulty) {
         Difficulty diff = (Difficulty) cbDifficulty.getSelectedItem();
-        this.rows = diff.getRows();
-        this.cols = diff.getCols();
-        this.bombs = diff.getBombs();
-        this.lastMove = Move.VALID;
+        int rows = diff.getRows();
+        int cols = diff.getCols();
+        int bombs = diff.getBombs();
         if (this.boardPanel != null) {
             this.boardPanel.removeAll();
             this.boardPanel.setLayout(new GridLayout(rows, cols));
@@ -62,194 +50,52 @@ public class MainWindow extends JFrame {
             this.add(boardPanel);
         }
 
-        this.squares = new Square[rows][cols];
+        this.mineField = new Minesweeper(rows, cols, bombs);
+        Square[][] squares = new Square[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Square b = new Square();
-                b.setBackground(Color.darkGray);
+                b.setBackground(Color.DARK_GRAY);
                 b.setSize(new Dimension(32, 32));
-                b.setFont(new Font("Verdana", Font.PLAIN, 12));
+                b.setFont(new Font("Arial", Font.PLAIN, 12));
                 b.setMargin(new Insets(0, 0, 0, 0));
-                this.squares[i][j] = b;
+                squares[i][j] = b;
                 this.boardPanel.add(b);
-                final int row = i, col = j;
+                this.mineField.addObserver(b, i, j);
+                final int x = i, y = j;
                 b.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        if (lastMove == Move.LOSE || lastMove == Move.WIN) {
-                            return;
+                        State state = State.SHOW;
+                        if (e.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK) {
+                            state = State.FLAG;
                         }
-                        State state = b.getState();
-                        if (e.getModifiersEx() == MouseEvent.BUTTON1_DOWN_MASK) {
-                            if (state != State.FLAG) {
-                                FieldValue value = b.getValue();
-                                Move ret;
-                                switch (value) {
-                                    case BOMB:
-                                        ret = Move.LOSE;
-                                        break;
-                                    case NONE:
-                                        openCell(row, col);
-                                        ret = endOfGame();
-                                        break;
-                                    default:
-                                        showCell(b);
-                                        ret = endOfGame();
-                                        break;
-                                }
-                                if (ret == Move.LOSE) {
-                                    showBombs();
-                                    showMessage("You lose!");
-                                }
-                                if (ret == Move.WIN) {
-                                    showBombs();
-                                    showMessage("You win!");
-                                }
-                                lastMove = ret;
-                            }
-                        } else if (e.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK) {
-                            if (state == State.FLAG) {
-                                b.setIcon(null);
-                                b.setState(State.HIDE);
-                            } else if (state == State.HIDE) {
-                                URL resource = getClass().getClassLoader().getResource("flag_icon.png");
-                                ImageIcon icon = new ImageIcon(resource);
-                                Image img = icon.getImage();
-                                Image newimg = img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
-                                icon = new ImageIcon(newimg);
-                                b.setIcon(icon);
-                                b.setForeground(Color.WHITE);
-                                b.setState(State.FLAG);
-                            }
-                            setNumOfBombs(getNumOfFlags());
+                        Move m = mineField.play(x, y, state);
+                        switch (m) {
+                            case WIN:
+                                showMessage("You win!");
+                                break;
+                            case LOSE:
+                                showMessage("You lose!");
+                                break;
+                            default:
+                                break;
                         }
+                        setNumOfBombs(mineField.getNumOfFlags());
                     }
                 });
             }
         }
         this.boardPanel.revalidate();
-
         this.boardPanel.setPreferredSize(new Dimension(32 * cols, 32 * rows));
 
-        this.fillBombs();
-        this.setNumbers();
-        this.setNumOfBombs(this.bombs);
+        this.setNumOfBombs(bombs);
 
         this.setDimension();
     }
 
-    private long getNumOfFlags() {
-        return this.bombs - Arrays.stream(this.squares).flatMap(x -> Arrays.stream(x))
-                .filter(x -> x.getState() == State.FLAG).count();
-    }
-
-    private void fillBombs() {
-        for (int i = 0; i < bombs;) {
-            int row = (int) Math.floor((Math.random() * rows));
-            int col = (int) Math.floor((Math.random() * cols));
-            if (squares[row][col].getValue() == FieldValue.NONE) {
-                squares[row][col].setValue(FieldValue.BOMB);
-                i++;
-            }
-        }
-    }
-
-    private void setNumbers() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (squares[i][j].getValue() == FieldValue.NONE) {
-                    squares[i][j].setValue(FieldValue.values()[countPosition(i, j)]);
-                }
-            }
-        }
-    }
-
-    private int countPosition(int row, int col) {
-        int count = 0;
-        for (int i = row - 1; i <= row + 1; i++) {
-            for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rows && j >= 0 && j < cols && squares[i][j].getValue() == FieldValue.BOMB) {
-                    count++;
-                }
-            }
-        }
-        return count;
-    }
-
-    protected void openCell(int row, int col) {
-        Square cell = this.squares[row][col];
-        if (cell.getValue() != FieldValue.BOMB) {
-            if (cell.getValue() == FieldValue.NONE && cell.getState() == State.HIDE) {
-                showCell(cell);
-                openCells(row, col);
-            } else {
-                showCell(cell);
-            }
-        }
-    }
-
-    private void openCells(int row, int col) {
-        for (int i = row - 1; i <= row + 1; i++) {
-            for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rows && j >= 0 && j < cols) {
-                    openCell(i, j);
-                }
-            }
-        }
-    }
-
-    protected Move endOfGame() {
-        long blocked = Arrays.stream(squares).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() != State.SHOW)
-                .count();
-        if (blocked == this.bombs) {
-            return Move.WIN;
-        } else {
-            return Move.VALID;
-        }
-    }
-
     protected void showMessage(String msg) {
         JOptionPane.showMessageDialog(this, msg);
-    }
-
-    private void showCell(Square s) {
-        FieldValue value = s.getValue();
-        String text;
-        s.setBackground(Color.white);
-        switch (value) {
-            case BOMB:
-                URL resource = getClass().getClassLoader().getResource("bomb_icon.png");
-                ImageIcon icon = new ImageIcon(resource);
-                Image img = icon.getImage();
-                Image newimg = img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
-                icon = new ImageIcon(newimg);
-                s.setIcon(icon);
-                s.setForeground(Color.black);
-                s.setBackground(Color.lightGray);
-                break;
-            case NONE:
-                text = " ";
-                s.setText(text);
-                break;
-            default:
-                text = "" + value.ordinal();
-                Color[] colors = { Color.blue, Color.green, Color.red, Color.orange, Color.magenta, Color.PINK,
-                        Color.CYAN, Color.DARK_GRAY };
-                s.setForeground(colors[value.ordinal() - 1]);
-                s.setText(text);
-                break;
-        }
-        s.setFont(s.getFont().deriveFont(Font.BOLD));
-        s.setState(State.SHOW);
-        s.setFocusPainted(false);
-    }
-
-    protected void showBombs() {
-        Arrays.stream(squares).flatMap(x -> Arrays.stream(x)).forEach(s -> {
-            if (s.getValue() == FieldValue.BOMB) {
-                this.showCell(s);
-            }
-        });
     }
 
     private void createWindow() {
@@ -297,9 +143,9 @@ public class MainWindow extends JFrame {
         }
     }
 
-    public void setNumOfBombs(long numBombs) {
+    private void setNumOfBombs(long numOfBombs) {
         if (this.lNumBombs != null) {
-            this.lNumBombs.setText("" + numBombs);
+            this.lNumBombs.setText("" + numOfBombs);
         }
     }
 
