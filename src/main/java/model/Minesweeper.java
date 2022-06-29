@@ -2,6 +2,7 @@ package model;
 
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public final class Minesweeper {
 
@@ -159,5 +160,25 @@ public final class Minesweeper {
         }
         this.lastMove = ret;
         return ret;
+    }
+
+    public Field[][] getHiddenMatrix() {
+        Field[][] ret = new Field[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                Field cell = new Field(matrix[i][j].getValue(), matrix[i][j].getState());
+                ret[i][j] = cell;
+                if (cell.getState() != State.SHOW) {
+                    ret[i][j].setValue(FieldValue.NONE);
+                }
+            }
+        }
+        return ret;
+    }
+
+    public long getRemainingBombs() {
+        Stream<Field> s = Stream.of(matrix).flatMap(Stream::of);
+        long count = s.filter(c -> c.getState() == State.FLAG).count();
+        return this.bombs - count;
     }
 }
