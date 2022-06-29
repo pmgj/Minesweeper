@@ -1,0 +1,57 @@
+h1, p {
+    text-align: center;
+}
+p {
+    font-size: x-large;
+}
+table {
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+td {
+    border: 1px solid black;    
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+.blocked {
+    background: radial-gradient(lightgray, gray);
+}
+.show {
+    background-color: white;
+    color: black;
+    font-weight: bold;
+}
+.flag {
+    background-color: gray;
+    color: white;
+    transition: color 0.5s;
+    transition: background-color 0.5s;
+}
+.b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8 {
+    background-color: white;
+}
+.b1 {
+    color: blue;
+}
+.b2 {
+    color: green;
+}
+.b3 {
+    color: red;
+}
+.b4 {
+    color: #0000A0;
+}
+.b5 {
+    color: maroon;
+}
+.b6 {
+    color: orange;
+}
+.b7 {
+    color: magenta;
+}
+.b8 {
+    color: salmon;
+}
