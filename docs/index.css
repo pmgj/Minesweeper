@@ -13,20 +13,21 @@ td {
     width: 30px;
     height: 30px;
     text-align: center;
+    transition: background-color 1s, color 1s;
 }
 .blocked {
-    background: radial-gradient(lightgray, gray);
+    background-color: gray;
+    /*background-image: radial-gradient(lightgray, gray);*/
 }
 .show {
+    /*background-image: radial-gradient(white, white);*/
     background-color: white;
     color: black;
     font-weight: bold;
 }
 .flag {
-    background-color: gray;
+    background-color: lightgray;
     color: white;
-    transition: color 0.5s;
-    transition: background-color 0.5s;
 }
 .b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8 {
     background-color: white;
