@@ -18,7 +18,6 @@ public final class Minesweeper {
         this.bombs = numbombs;
         this.matrix = new Field[numrows][numcols];
         this.fillBombs();
-        this.setNumbers();
     }
 
     public void addObserver(PropertyChangeListener p, int row, int col) {
@@ -26,21 +25,28 @@ public final class Minesweeper {
     }
 
     public long getNumOfFlags() {
-        return this.bombs - Arrays.stream(matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() == State.FLAG).count();
+        return this.bombs - Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() == State.FLAG).count();
     }
 
     private void fillBombs() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
                 matrix[i][j] = new Field(FieldValue.NONE, State.HIDE);
             }
         }
-        for (int i = 0; i < bombs;) {
-            int row = (int) Math.floor((Math.random() * rows));
-            int col = (int) Math.floor((Math.random() * cols));
+        for (int i = 0; i < this.bombs;) {
+            int row = (int) Math.floor((Math.random() * this.rows));
+            int col = (int) Math.floor((Math.random() * this.cols));
             if (matrix[row][col].getValue() == FieldValue.NONE) {
                 matrix[row][col].setValue(FieldValue.BOMB);
                 i++;
+            }
+        }
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                if (matrix[i][j].getValue() == FieldValue.NONE) {
+                    matrix[i][j].setValue(FieldValue.values()[this.countPosition(i, j)]);
+                }
             }
         }
     }
@@ -49,7 +55,7 @@ public final class Minesweeper {
         int count = 0;
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rows && j >= 0 && j < cols && matrix[i][j].getValue() == FieldValue.BOMB) {
+                if (i >= 0 && i < this.rows && j >= 0 && j < this.cols && matrix[i][j].getValue() == FieldValue.BOMB) {
                     count++;
                 }
             }
@@ -57,33 +63,19 @@ public final class Minesweeper {
         return count;
     }
 
-    private void setNumbers() {
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (matrix[i][j].getValue() == FieldValue.NONE) {
-                    matrix[i][j].setValue(FieldValue.values()[countPosition(i, j)]);
-                }
-            }
-        }
-    }
-
     private Move endOfGame() {
-        long blocked = Arrays.stream(matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() != State.SHOW).count();
-        if (blocked == this.bombs) {
-            return Move.WIN;
-        } else {
-            return Move.VALID;
-        }
+        long blocked = Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() != State.SHOW).count();
+        return blocked == this.bombs ? Move.WIN : Move.VALID;
     }
 
     private void openCell(int row, int col) {
         Field f = this.matrix[row][col];
         if (f.getValue() != FieldValue.BOMB) {
             if (f.getValue() == FieldValue.NONE && f.getState() == State.HIDE) {
-                showCell(row, col);
-                openCells(row, col);
+                this.showCell(row, col);
+                this.openCells(row, col);
             } else {
-                showCell(row, col);
+                this.showCell(row, col);
             }
         }
     }
@@ -98,7 +90,7 @@ public final class Minesweeper {
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
                 if (i >= 0 && i < rowMax && j >= 0 && j < colMax) {
-                    openCell(i, j);
+                    this.openCell(i, j);
                 }
             }
         }
@@ -164,9 +156,9 @@ public final class Minesweeper {
 
     public Field[][] getHiddenMatrix() {
         Field[][] ret = new Field[rows][cols];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                Field cell = new Field(matrix[i][j].getValue(), matrix[i][j].getState());
+        for (int i = 0; i < this.rows; i++) {
+            for (int j = 0; j < this.cols; j++) {
+                Field cell = new Field(this.matrix[i][j].getValue(), this.matrix[i][j].getState());
                 ret[i][j] = cell;
                 if (cell.getState() != State.SHOW) {
                     ret[i][j].setValue(FieldValue.NONE);
@@ -177,8 +169,6 @@ public final class Minesweeper {
     }
 
     public long getRemainingBombs() {
-        Stream<Field> s = Stream.of(matrix).flatMap(Stream::of);
-        long count = s.filter(c -> c.getState() == State.FLAG).count();
-        return this.bombs - count;
+        return this.bombs - Stream.of(this.matrix).flatMap(Stream::of).filter(c -> c.getState() == State.FLAG).count();
     }
 }
