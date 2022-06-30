@@ -1,5 +1,5 @@
-import {Cell} from "./Cell.js";
-import {Minesweeper} from "./Minesweeper.js";
+import Cell from "./Cell.js";
+import Minesweeper from "./Minesweeper.js";
 
 function GUI() {
     let cm = null;

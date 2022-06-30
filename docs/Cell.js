@@ -1,4 +1,4 @@
-export const Cell = Object.freeze({
+export default Object.freeze({
     BOMB: -1,
     EMPTY: 0
 //    B1: 1,

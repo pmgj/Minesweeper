@@ -1,6 +1,6 @@
-import {Cell} from "./Cell.js";
+import Cell from "./Cell.js";
 
-function Minesweeper(rows, cols, bombs) {
+export default function Minesweeper(rows, cols, bombs) {
     var rows = rows;
     var cols = cols;
     var bombs = bombs;
@@ -57,5 +57,3 @@ function Minesweeper(rows, cols, bombs) {
     }
     return {getRows, getCols, getBombs, getCell, fillBombs};
 }
-
-export {Minesweeper};
