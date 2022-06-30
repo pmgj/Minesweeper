@@ -44,12 +44,6 @@ public class Square extends JButton implements PropertyChangeListener {
                         this.setIcon(icon);
                         this.setForeground(Color.black);
                         this.setBackground(Color.lightGray);
-
-                        /*
-                         * text = "B";
-                         * this.setForeground(Color.BLACK);
-                         * this.setBackground(Color.LIGHT_GRAY);
-                         */
                         break;
                     case NONE:
                         text = " ";

@@ -27,7 +27,7 @@ td {
 }
 .flag {
     background-color: lightgray;
-    color: white;
+    color: black;
 }
 .b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8 {
     background-color: white;
@@ -42,7 +42,7 @@ td {
     color: red;
 }
 .b4 {
-    color: #0000A0;
+    color: darkblue;
 }
 .b5 {
     color: maroon;

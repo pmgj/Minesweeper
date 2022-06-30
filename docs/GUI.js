@@ -1,5 +1,7 @@
-import Cell from "./Cell.js";
+import FieldValue from "./FieldValue.js";
 import Minesweeper from "./Minesweeper.js";
+import State from "./State.js";
+import Move from "./Move.js";
 
 function GUI() {
     let cm = null;
@@ -17,59 +19,38 @@ function GUI() {
         }
         table.innerHTML = inner;
     }
-    function showCell(row, col) {
-        let cell = table.rows[row].cells[col];
-        cell.className = "show";
-        let str = cm.getCell(row, col);
-        switch (cm.getCell(row, col)) {
-            case Cell.BOMB:
-                str = "&#128163;";
-                cell.className = "flag";
-                break;
-            case Cell.EMPTY:
-                str = "";
-                break;
-            default:
-                cell.className = "b" + cm.getCell(row, col);
-        }
-        cell.innerHTML = str;
-    }
-    function openCell(row, col) {
-        let cell = table.rows[row].cells[col];
-        if (cm.getCell(row, col) !== Cell.BOMB) {
-            if (cm.getCell(row, col) === Cell.EMPTY && cell.className === 'blocked') {
-                showCell(row, col);
-                openCells(row, col);
-            } else {
-                showCell(row, col);
-            }
-        }
-    }
-    function openCells(row, col) {
-        let rowMax = cm.getRows(), colMax = cm.getCols();
-        for (let i = row - 1; i <= row + 1; i++) {
-            for (let j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rowMax && j >= 0 && j < colMax) {
-                    openCell(i, j);
-                }
-            }
-        }
-    }
-    function showBombs() {
+    function updateMatrixTable() {
+        let hm = cm.getHiddenMatrix();
         for (let i = 0; i < cm.getRows(); i++) {
             for (let j = 0; j < cm.getCols(); j++) {
-                if (cm.getCell(i, j) === Cell.BOMB) {
-                    showCell(i, j);
+                let square = hm[i][j];
+                let td = table.rows[i].cells[j];
+                switch (square.getState()) {
+                    case State.FLAG:
+                        td.className = "flag";
+                        td.innerHTML = "&#9873;";
+                        break;
+                    case State.HIDE:
+                        td.className = "blocked";
+                        td.innerHTML = "";
+                        break;
+                    case State.SHOW:
+                        switch (square.getValue()) {
+                            case FieldValue.BOMB:
+                                td.className = "flag";
+                                td.innerHTML = "&#128163;";
+                                break;
+                            case FieldValue.EMPTY:
+                                td.className = "show";
+                                td.innerHTML = "";
+                                break;
+                            default:
+                                td.className = "b" + square.getValue();
+                                td.innerHTML = square.getValue();
+                        }
+                        break;
                 }
             }
-        }
-    }
-    function endOfGame() {
-        let blocked = document.querySelectorAll(".blocked").length;
-        if (blocked === numFlags) {
-            showMessage("Você ganhou! &#9786;");
-            showBombs();
-            unsetEvents();
         }
     }
     function showMessage(msg) {
@@ -80,33 +61,23 @@ function GUI() {
         let cell = event.target;
         let col = cell.cellIndex;
         let row = cell.parentNode.rowIndex;
-        let value = cm.getCell(row, col);
-        if (cell.className !== 'flag') {
-            if (value === Cell.BOMB) {
-                showMessage("Você perdeu! &#9785;");
-                showBombs();
-                unsetEvents();
-            } else if (value === Cell.EMPTY) {
-                openCell(row, col);
-                endOfGame();
-            } else {
-                showCell(row, col);
-                endOfGame();
-            }
+        let m = cm.play(row, col, State.SHOW);
+        if (m === Move.LOSE) {
+            showMessage("You lose! &#9785;");
+            unsetEvents();
+        } else if (m === Move.WIN) {
+            showMessage("You win! &#9786;");
+            unsetEvents();
         }
+        updateMatrixTable();
     }
     function markBomb(event) {
         let cell = event.target;
-        if (cell.className === "flag") {
-            cell.innerHTML = "";
-            cell.className = "blocked";
-            setNumOfBombs(++numFlags);
-        } else if (cell.className === "blocked") {
-            cell.innerHTML = "&#9873;";
-            cell.className = "flag";
-            setNumOfBombs(--numFlags);
-        }
-        endOfGame();
+        let col = cell.cellIndex;
+        let row = cell.parentNode.rowIndex;
+        cm.play(row, col, State.FLAG);
+        updateMatrixTable();
+        setNumOfBombs(cm.getNumOfFlags());
         event.preventDefault();
     }
     function setEvents() {
@@ -122,14 +93,14 @@ function GUI() {
         p.textContent = n;
     }
     function newGame() {
-        let difficulties = [{rows: 9, cols: 9, bombs: 10}, {rows: 16, cols: 16, bombs: 40}, {rows: 16, cols: 40, bombs: 99}];
+        let difficulties = [{ rows: 9, cols: 9, bombs: 10 }, { rows: 16, cols: 16, bombs: 40 }, { rows: 16, cols: 40, bombs: 99 }];
         let diff = document.querySelector("#difficulty");
         let value = (diff.value) ? parseInt(diff.value) : 0;
-        let {rows, cols, bombs} = difficulties[value];
+        let { rows, cols, bombs } = difficulties[value];
         cm = new Minesweeper(rows, cols, bombs);
+        cm.createMatrix();
         numFlags = bombs;
         setNumOfBombs(bombs);
-        cm.fillBombs();
         printMatrixTable();
         setEvents();
         showMessage("");
@@ -139,7 +110,7 @@ function GUI() {
         button.onclick = newGame;
         newGame();
     }
-    return {init};
+    return { init };
 }
 let gui = new GUI();
 gui.init();
