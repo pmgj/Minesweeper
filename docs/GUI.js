@@ -6,6 +6,7 @@ import Winner from "./Winner.js";
 function GUI() {
     let cm = null;
     let table = null;
+    let difficulties = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];
     function printMatrixTable() {
         table = document.querySelector("table");
         let inner = "";
@@ -92,7 +93,6 @@ function GUI() {
         p.textContent = n;
     }
     function newGame() {
-        let difficulties = [{ rows: 9, cols: 9, bombs: 10 }, { rows: 16, cols: 16, bombs: 40 }, { rows: 16, cols: 40, bombs: 99 }];
         let diff = document.querySelector("#difficulty");
         let value = (diff.value) ? parseInt(diff.value) : 0;
         let { rows, cols, bombs } = difficulties[value];
@@ -104,6 +104,12 @@ function GUI() {
         showMessage("");
     }
     function init() {
+        let diff = document.querySelector("#difficulty");
+        let str = "";
+        difficulties.forEach((value, i) => {
+            str += `<option value="${i}">${value.name} (${value.rows} x ${value.cols}, ${value.bombs} bombs)</option>`;
+        });
+        diff.innerHTML = str;
         let button = document.querySelector("input[type='button']");
         button.onclick = newGame;
         newGame();
