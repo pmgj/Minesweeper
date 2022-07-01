@@ -1,5 +1,5 @@
 export default Object.freeze({
-    VALID: "VALID",
+    NONE: "NONE",
     WIN: "WIN",
     LOSE: "LOSE"
 });

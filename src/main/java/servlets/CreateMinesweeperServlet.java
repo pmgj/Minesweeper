@@ -1,7 +1,7 @@
 package servlets;
 
 import model.Minesweeper;
-import model.Move;
+import model.Winner;
 
 import java.io.IOException;
 import jakarta.json.bind.JsonbBuilder;
@@ -29,7 +29,7 @@ public class CreateMinesweeperServlet extends HttpServlet {
         Minesweeper mine = new Minesweeper(rows, cols, bombs);
         HttpSession session = request.getSession();
         session.setAttribute("campo", mine);
-        Message m = new Message(Move.VALID, mine.getHiddenMatrix(), mine.getRemainingBombs());
+        Message m = new Message(Winner.NONE, mine.getHiddenMatrix(), mine.getRemainingBombs());
         response.addHeader("Content-Type", "application/json");
         response.getWriter().print(JsonbBuilder.create().toJson(m));
     }

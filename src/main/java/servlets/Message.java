@@ -1,21 +1,18 @@
 package servlets;
 
-import jakarta.json.bind.JsonbBuilder;
 import model.Field;
-import model.FieldValue;
-import model.Move;
-import model.State;
+import model.Winner;
 
 public class Message {
     private Field[][] board;
-    private Move winner;
+    private Winner winner;
     private long bombs;
 
     public Message() {
         
     }
     
-    public Message(Move win, Field[][] board, long bombs) {
+    public Message(Winner win, Field[][] board, long bombs) {
         this.winner = win;
         this.board = board;
         this.bombs = bombs;
@@ -29,11 +26,11 @@ public class Message {
         this.board = board;
     }
 
-    public Move getWinner() {
+    public Winner getWinner() {
         return winner;
     }
 
-    public void setWinner(Move winner) {
+    public void setWinner(Winner winner) {
         this.winner = winner;
     }
 
@@ -43,15 +40,5 @@ public class Message {
 
     public void setBombs(long bombs) {
         this.bombs = bombs;
-    }
-
-    public static void main(String[] args) {
-        var board = new Field[2][2];
-        board[0][0] = new Field(FieldValue.VL_1, State.SHOW);
-        board[0][1] = new Field(FieldValue.BOMB, State.SHOW);
-        board[1][0] = new Field(FieldValue.NONE, State.SHOW);
-        board[1][1] = new Field(FieldValue.VL_2, State.HIDE);
-        Message m = new Message(Move.VALID, board, 1);
-        System.out.println(JsonbBuilder.create().toJson(m));
     }
 }

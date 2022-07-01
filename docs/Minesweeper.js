@@ -1,14 +1,14 @@
 import FieldValue from "./FieldValue.js";
 import Field from "./Field.js";
 import State from "./State.js";
-import Move from "./Move.js";
+import Winner from "./Winner.js";
 
 export default class Minesweeper {
     constructor(rows, cols, bombs) {
         this.rows = rows;
         this.cols = cols;
         this.bombs = bombs;
-        this.matrix = Array(this.rows).fill().map(()=>Array(this.cols).fill());
+        this.matrix = Array(this.rows).fill().map(() => Array(this.cols).fill());
         this.lastMove = null;
     }
     getRows() {
@@ -23,20 +23,20 @@ export default class Minesweeper {
     createMatrix() {
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
-                this.matrix[i][j] = new Field(FieldValue.EMPTY, State.HIDE);
+                this.matrix[i][j] = new Field(FieldValue.NONE, State.HIDE);
             }
         }
         for (let i = 0; i < this.bombs;) {
             let row = Math.floor((Math.random() * this.rows));
             let col = Math.floor((Math.random() * this.cols));
-            if (this.matrix[row][col].getValue() === FieldValue.EMPTY) {
+            if (this.matrix[row][col].getValue() === FieldValue.NONE) {
                 this.matrix[row][col].setValue(FieldValue.BOMB);
                 i++;
             }
         }
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
-                if (this.matrix[i][j].getValue() === FieldValue.EMPTY) {
+                if (this.matrix[i][j].getValue() === FieldValue.NONE) {
                     this.matrix[i][j].setValue(this.countPosition(i, j));
                 }
             }
@@ -58,12 +58,12 @@ export default class Minesweeper {
     }
     endOfGame() {
         let blocked = this.matrix.flat().filter(x => x.getState() != State.SHOW).length;
-        return blocked === this.bombs ? Move.WIN : Move.VALID;
+        return blocked === this.bombs ? Winner.WIN : Winner.NONE;
     }
     openCell(row, col) {
         let f = this.matrix[row][col];
         if (f.getValue() != FieldValue.BOMB) {
-            if (f.getValue() == FieldValue.EMPTY && f.getState() == State.HIDE) {
+            if (f.getValue() == FieldValue.NONE && f.getState() == State.HIDE) {
                 this.showCell(row, col);
                 this.openCells(row, col);
             } else {
@@ -96,11 +96,11 @@ export default class Minesweeper {
         }
     }
     play(row, col, state) {
-        if (this.lastMove == Move.LOSE || this.lastMove == Move.WIN) {
-            return Move.VALID;
+        if (this.lastMove == Winner.LOSE || this.lastMove == Winner.WIN) {
+            return Winner.NONE;
         }
         let f = this.matrix[row][col];
-        let ret = Move.VALID;
+        let ret = Winner.NONE;
         switch (state) {
             case State.FLAG:
                 if (f.getState() == State.HIDE) {
@@ -123,9 +123,9 @@ export default class Minesweeper {
         let f = this.matrix[row][col];
         switch (f.getValue()) {
             case FieldValue.BOMB:
-                ret = Move.LOSE;
+                ret = Winner.LOSE;
                 break;
-            case FieldValue.EMPTY:
+            case FieldValue.NONE:
                 this.openCell(row, col);
                 ret = this.endOfGame();
                 break;
@@ -134,20 +134,20 @@ export default class Minesweeper {
                 ret = this.endOfGame();
                 break;
         }
-        if (ret == Move.WIN || ret == Move.LOSE) {
+        if (ret == Winner.WIN || ret == Winner.LOSE) {
             this.showBombs();
         }
         this.lastMove = ret;
         return ret;
     }
     getHiddenMatrix() {
-        let ret = Array(this.rows).fill().map(()=>Array(this.cols).fill());
+        let ret = Array(this.rows).fill().map(() => Array(this.cols).fill());
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
                 let cell = new Field(this.matrix[i][j].getValue(), this.matrix[i][j].getState());
                 ret[i][j] = cell;
                 if (cell.getState() != State.SHOW) {
-                    ret[i][j].setValue(FieldValue.EMPTY);
+                    ret[i][j].setValue(FieldValue.NONE);
                 }
             }
         }

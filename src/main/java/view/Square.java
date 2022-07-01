@@ -22,12 +22,15 @@ public class Square extends JButton implements PropertyChangeListener {
         FieldValue value = f.getValue();
         State state = f.getState();
         String text = "";
+        URL resource = null;
+        ImageIcon icon = null;
+        Image img = null, newimg = null;
         switch (state) {
             case FLAG:
-                URL resource = getClass().getClassLoader().getResource("flag_icon.png");
-                ImageIcon icon = new ImageIcon(resource);
-                Image img = icon.getImage();
-                Image newimg = img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
+                resource = getClass().getClassLoader().getResource("flag_icon.png");
+                icon = new ImageIcon(resource);
+                img = icon.getImage();
+                newimg = img.getScaledInstance(32, 32, java.awt.Image.SCALE_SMOOTH);
                 icon = new ImageIcon(newimg);
                 this.setIcon(icon);
                 this.setForeground(Color.WHITE);
@@ -58,7 +61,10 @@ public class Square extends JButton implements PropertyChangeListener {
                         break;
                 }
                 break;
-            default:
+            case HIDE:
+                this.setIcon(null);
+                this.setBackground(Color.DARK_GRAY);
+                f.setState(State.HIDE);
                 break;
         }
         this.setFont(this.getFont().deriveFont(Font.BOLD));

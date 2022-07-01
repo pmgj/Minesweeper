@@ -8,6 +8,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,9 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 import model.Minesweeper;
-import model.Move;
 import model.State;
+import model.Winner;
 import model.difficulty.Advanced;
 import model.difficulty.Beginner;
 import model.difficulty.Difficulty;
@@ -51,7 +53,6 @@ public class MainWindow extends JFrame {
         }
 
         this.mineField = new Minesweeper(rows, cols, bombs);
-        Square[][] squares = new Square[rows][cols];
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Square b = new Square();
@@ -59,18 +60,14 @@ public class MainWindow extends JFrame {
                 b.setSize(new Dimension(32, 32));
                 b.setFont(new Font("Arial", Font.PLAIN, 12));
                 b.setMargin(new Insets(0, 0, 0, 0));
-                squares[i][j] = b;
                 this.boardPanel.add(b);
                 this.mineField.addObserver(b, i, j);
                 final int x = i, y = j;
                 b.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        State state = State.SHOW;
-                        if (e.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK) {
-                            state = State.FLAG;
-                        }
-                        Move m = mineField.play(x, y, state);
+                        State state = e.getModifiersEx() == MouseEvent.BUTTON3_DOWN_MASK ? State.FLAG : State.SHOW;
+                        Winner m = mineField.play(x, y, state);
                         switch (m) {
                             case WIN:
                                 showMessage("You win!");

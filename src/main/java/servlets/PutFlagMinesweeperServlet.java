@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Minesweeper;
-import model.Move;
+import model.Winner;
 import model.State;
 
 @MultipartConfig
@@ -27,7 +27,7 @@ public class PutFlagMinesweeperServlet extends HttpServlet {
         int col = Integer.parseInt(coluna);
         HttpSession session = request.getSession();
         Minesweeper mine = (Minesweeper) session.getAttribute("campo");        
-        Move mr = mine.play(row, col, State.FLAG);
+        Winner mr = mine.play(row, col, State.FLAG);
         response.addHeader("Content-Type", "application/json");
         Message m = new Message(mr, mine.getHiddenMatrix(), mine.getRemainingBombs());
         response.getWriter().print(JsonbBuilder.create().toJson(m));

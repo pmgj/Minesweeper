@@ -1,12 +1,11 @@
 import FieldValue from "./FieldValue.js";
 import Minesweeper from "./Minesweeper.js";
 import State from "./State.js";
-import Move from "./Move.js";
+import Winner from "./Winner.js";
 
 function GUI() {
     let cm = null;
     let table = null;
-    let numFlags = 0;
     function printMatrixTable() {
         table = document.querySelector("table");
         let inner = "";
@@ -40,7 +39,7 @@ function GUI() {
                                 td.className = "flag";
                                 td.innerHTML = "&#128163;";
                                 break;
-                            case FieldValue.EMPTY:
+                            case FieldValue.NONE:
                                 td.className = "show";
                                 td.innerHTML = "";
                                 break;
@@ -62,10 +61,10 @@ function GUI() {
         let col = cell.cellIndex;
         let row = cell.parentNode.rowIndex;
         let m = cm.play(row, col, State.SHOW);
-        if (m === Move.LOSE) {
+        if (m === Winner.LOSE) {
             showMessage("You lose! &#9785;");
             unsetEvents();
-        } else if (m === Move.WIN) {
+        } else if (m === Winner.WIN) {
             showMessage("You win! &#9786;");
             unsetEvents();
         }
@@ -99,7 +98,6 @@ function GUI() {
         let { rows, cols, bombs } = difficulties[value];
         cm = new Minesweeper(rows, cols, bombs);
         cm.createMatrix();
-        numFlags = bombs;
         setNumOfBombs(bombs);
         printMatrixTable();
         setEvents();

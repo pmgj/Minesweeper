@@ -10,7 +10,7 @@ public final class Minesweeper {
     private final int rows;
     private final int cols;
     private final int bombs;
-    private Move lastMove;
+    private Winner lastMove;
 
     public Minesweeper(int numrows, int numcols, int numbombs) {
         this.rows = numrows;
@@ -63,9 +63,9 @@ public final class Minesweeper {
         return count;
     }
 
-    private Move endOfGame() {
+    private Winner endOfGame() {
         long blocked = Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() != State.SHOW).count();
-        return blocked == this.bombs ? Move.WIN : Move.VALID;
+        return blocked == this.bombs ? Winner.WIN : Winner.NONE;
     }
 
     private void openCell(int row, int col) {
@@ -107,12 +107,12 @@ public final class Minesweeper {
         }
     }
 
-    public Move play(int row, int col, State state) {
-        if(this.lastMove == Move.LOSE || this.lastMove == Move.WIN) {
-            return Move.VALID;
+    public Winner play(int row, int col, State state) {
+        if(this.lastMove == Winner.LOSE || this.lastMove == Winner.WIN) {
+            return Winner.NONE;
         }
         Field f = this.matrix[row][col];
-        Move ret = Move.VALID;
+        Winner ret = Winner.NONE;
         switch (state) {
             case FLAG:
                 if (f.getState() == State.HIDE) {
@@ -131,12 +131,12 @@ public final class Minesweeper {
         return ret;
     }
 
-    private Move play(int row, int col) {
-        Move ret;
+    private Winner play(int row, int col) {
+        Winner ret;
         Field f = this.matrix[row][col];
         switch (f.getValue()) {
             case BOMB:
-                ret = Move.LOSE;
+                ret = Winner.LOSE;
                 break;
             case NONE:
                 this.openCell(row, col);
@@ -147,7 +147,7 @@ public final class Minesweeper {
                 ret = this.endOfGame();
                 break;
         }
-        if (ret == Move.WIN || ret == Move.LOSE) {
+        if (ret == Winner.WIN || ret == Winner.LOSE) {
             this.showBombs();
         }
         this.lastMove = ret;

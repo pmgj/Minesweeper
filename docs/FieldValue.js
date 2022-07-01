@@ -1,5 +1,5 @@
 export default Object.freeze({
-    EMPTY: 0,
+    NONE: 0,
     VL_1: 1,
     VL_2: 2,
     VL_3: 3,
