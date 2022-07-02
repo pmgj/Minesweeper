@@ -19,7 +19,7 @@ public final class Minesweeper {
         this.cols = numcols;
         this.bombs = numbombs;
         this.matrix = new Field[numrows][numcols];
-        this.fillBombs();
+        this.createMatrix();
     }
 
     public void addObserver(PropertyChangeListener p, int row, int col) {
@@ -31,7 +31,7 @@ public final class Minesweeper {
                 .filter(x -> x.getState() == State.FLAG).count();
     }
 
-    private void fillBombs() {
+    private void createMatrix() {
         for (int i = 0; i < this.rows; i++) {
             for (int j = 0; j < this.cols; j++) {
                 matrix[i][j] = new Field(FieldValue.NONE, State.HIDE);
