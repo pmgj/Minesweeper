@@ -2,6 +2,8 @@ package model;
 
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public final class Minesweeper {
@@ -25,7 +27,8 @@ public final class Minesweeper {
     }
 
     public long getNumOfFlags() {
-        return this.bombs - Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() == State.FLAG).count();
+        return this.bombs - Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x))
+                .filter(x -> x.getState() == State.FLAG).count();
     }
 
     private void fillBombs() {
@@ -51,11 +54,16 @@ public final class Minesweeper {
         }
     }
 
+    private boolean onBoard(int x, int y) {
+        BiFunction<Integer, Integer, Boolean> inLimit = (value, limit) -> value >= 0 && value < limit;
+        return inLimit.apply(x, this.rows) && inLimit.apply(y, this.cols);
+    }
+
     private int countPosition(int row, int col) {
         int count = 0;
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < this.rows && j >= 0 && j < this.cols && matrix[i][j].getValue() == FieldValue.BOMB) {
+                if (onBoard(i, j) && this.matrix[i][j].getValue() == FieldValue.BOMB) {
                     count++;
                 }
             }
@@ -63,63 +71,36 @@ public final class Minesweeper {
         return count;
     }
 
-    private Winner endOfGame() {
-        long blocked = Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(x -> x.getState() != State.SHOW).count();
-        return blocked == this.bombs ? Winner.WIN : Winner.NONE;
-    }
-
     private void openCell(int row, int col) {
         Field f = this.matrix[row][col];
         if (f.getValue() != FieldValue.BOMB) {
-            if (f.getValue() == FieldValue.NONE && f.getState() == State.HIDE) {
-                this.showCell(row, col);
+            State old = f.getState();
+            f.setState(State.SHOW);
+            if (f.getValue() == FieldValue.NONE && old == State.HIDE) {
                 this.openCells(row, col);
-            } else {
-                this.showCell(row, col);
             }
         }
     }
 
-    private void showCell(int row, int col) {
-        Field f = this.matrix[row][col];
-        f.setState(State.SHOW);
-    }
-
     private void openCells(int row, int col) {
-        int rowMax = this.rows, colMax = this.cols;
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < rowMax && j >= 0 && j < colMax) {
+                if (onBoard(i, j)) {
                     this.openCell(i, j);
                 }
             }
         }
     }
 
-    private void showBombs() {
-        for (int i = 0; i < this.rows; i++) {
-            for (int j = 0; j < this.cols; j++) {
-                FieldValue value = this.matrix[i][j].getValue();
-                if (value == FieldValue.BOMB) {
-                    this.showCell(i, j);
-                }
-            }
-        }
-    }
-
     public Winner play(int row, int col, State state) {
-        if(this.lastMove == Winner.LOSE || this.lastMove == Winner.WIN) {
+        if (this.lastMove == Winner.LOSE || this.lastMove == Winner.WIN) {
             return Winner.NONE;
         }
         Field f = this.matrix[row][col];
         Winner ret = Winner.NONE;
         switch (state) {
             case FLAG:
-                if (f.getState() == State.HIDE) {
-                    f.setState(State.FLAG);
-                } else {
-                    f.setState(State.HIDE);
-                }
+                f.setState(f.getState() == State.HIDE ? State.FLAG : State.HIDE);
                 break;
             case SHOW:
                 if (f.getState() == State.HIDE) {
@@ -132,23 +113,26 @@ public final class Minesweeper {
     }
 
     private Winner play(int row, int col) {
+        Supplier<Winner> endOfGame = () -> Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x))
+                .filter(x -> x.getState() != State.SHOW).count() == this.bombs ? Winner.WIN : Winner.NONE;
         Winner ret;
-        Field f = this.matrix[row][col];
-        switch (f.getValue()) {
+        Field field = this.matrix[row][col];
+        switch (field.getValue()) {
             case BOMB:
                 ret = Winner.LOSE;
                 break;
             case NONE:
                 this.openCell(row, col);
-                ret = this.endOfGame();
+                ret = endOfGame.get();
                 break;
             default:
-                this.showCell(row, col);
-                ret = this.endOfGame();
+                field.setState(State.SHOW);
+                ret = endOfGame.get();
                 break;
         }
         if (ret == Winner.WIN || ret == Winner.LOSE) {
-            this.showBombs();
+            Arrays.stream(this.matrix).flatMap(x -> Arrays.stream(x)).filter(f -> f.getValue() == FieldValue.BOMB)
+                    .forEach(f -> f.setState(State.SHOW));
         }
         this.lastMove = ret;
         return ret;
