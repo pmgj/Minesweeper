@@ -9,13 +9,16 @@ table {
     margin: 0 auto;
 }
 td {
-    border: 1px solid black;    
+    border: 1px solid black;
     width: 30px;
+    min-width: 30px;
     height: 30px;
+    min-height: 30px;
     text-align: center;
+    transition: background-color 1s, color 1s;
 }
 .blocked {
-    background: radial-gradient(lightgray, gray);
+    background-color: gray;
 }
 .show {
     background-color: white;
@@ -23,8 +26,11 @@ td {
     font-weight: bold;
 }
 .flag {
-    background-color: gray;
-    color: white;
+    background-color: lightgray;
+    color: black;
+}
+.b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8 {
+    background-color: white;
 }
 .b1 {
     color: blue;
@@ -36,7 +42,7 @@ td {
     color: red;
 }
 .b4 {
-    color: #0000A0;
+    color: darkblue;
 }
 .b5 {
     color: maroon;
@@ -49,8 +55,4 @@ td {
 }
 .b8 {
     color: salmon;
-}
-.b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8, .flag, .blocked {
-    transition: color 0.5s;
-    transition: background-color 0.5s;
 }

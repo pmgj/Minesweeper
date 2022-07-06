@@ -1,4 +1,5 @@
 let table, xhr = new XMLHttpRequest();
+let levels = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];
 function printMatrixTable(doc) {
     table = document.querySelector("table");
     table.innerHTML = "";
@@ -74,12 +75,10 @@ function markBomb(event) {
     return false;
 }
 function endOfGame(winner) {
-    if (winner) {
-        if (winner === "WIN") {
-            showMessage("You win! &#9786;");
-        } else if (winner === "LOSE") {
-            showMessage("You lose! &#9785;");
-        }
+    if (winner === "WIN") {
+        showMessage("You win! &#9786;");
+    } else if (winner === "LOSE") {
+        showMessage("You lose! &#9785;");
     }
 }
 function setEvents() {
@@ -96,9 +95,8 @@ function setNumOfBombs(n) {
 }
 function newGame() {
     let diff = document.querySelector("#difficulty");
-    let value = (diff.value) ? parseInt(diff.value) : 0;
-    let levels = [{rows: 9, cols: 9, bombs: 10}, {rows: 16, cols: 16, bombs: 40}, {rows: 16, cols: 40, bombs: 99}];
-    let {rows, cols, bombs} = levels[value];
+    let value = diff.value ? parseInt(diff.value) : 0;
+    let { rows, cols, bombs } = levels[value];
     let formData = new FormData();
     formData.append("rows", rows);
     formData.append("cols", cols);
@@ -118,6 +116,12 @@ function newGame() {
 function init() {
     let button = document.querySelector("input[type='button']");
     button.onclick = newGame;
+    let diff = document.querySelector("#difficulty");
+    let str = "";
+    levels.forEach((l, i) => {
+        str += `<option value="${i}">${l.name} (${l.rows} x ${l.cols}, ${l.bombs} bombs)</option>`;
+    });
+    diff.innerHTML = str;
     newGame();
 }
 onload = init;
