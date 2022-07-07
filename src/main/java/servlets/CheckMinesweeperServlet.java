@@ -19,17 +19,18 @@ import model.State;
 public class CheckMinesweeperServlet extends HttpServlet {
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String linha = request.getParameter("row");
         String coluna = request.getParameter("col");
+        String state = request.getParameter("state");
         int row = Integer.parseInt(linha);
         int col = Integer.parseInt(coluna);
         HttpSession session = request.getSession();
         Minesweeper mine = (Minesweeper) session.getAttribute("campo");        
-        Winner mr = mine.play(row, col, State.SHOW);
-        response.addHeader("Content-Type", "application/json");
+        Winner mr = mine.play(row, col, state.equals("SHOW") ? State.SHOW : State.FLAG);
         Message m = new Message(mr, mine.getHiddenMatrix(), mine.getRemainingBombs());
+        response.addHeader("Content-Type", "application/json");
         response.getWriter().print(JsonbBuilder.create().toJson(m));
     }
 }

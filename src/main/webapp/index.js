@@ -38,41 +38,31 @@ function check(event) {
     let cell = event.target;
     let col = cell.cellIndex;
     let row = cell.parentNode.rowIndex;
-    let formData = new FormData();
-    formData.append("row", row);
-    formData.append("col", col);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            let obj = JSON.parse(xhr.responseText);
-            printMatrixTable(obj.board);
-            setNumOfBombs(obj.bombs);
-            endOfGame(obj.winner);
-            setEvents();
-        }
-    };
-    xhr.open("post", "CheckMinesweeperServlet", true);
-    xhr.send(formData);
+    sendData(row, col, "SHOW");
 }
 function markBomb(event) {
     let cell = event.target;
     let col = cell.cellIndex;
     let row = cell.parentNode.rowIndex;
+    sendData(row, col, "FLAG");
+    event.preventDefault();
+}
+function sendData(row, col, state) {
     let formData = new FormData();
     formData.append("row", row);
     formData.append("col", col);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log(xhr.responseText);
-            let obj = JSON.parse(xhr.responseText);
-            printMatrixTable(obj.board);
-            setNumOfBombs(obj.bombs);
-            endOfGame(obj.winner);
-            setEvents();
-        }
+    formData.append("state", state);
+    xhr.onload = function () {
+        console.log(xhr.responseText);
+        let obj = JSON.parse(xhr.responseText);
+        printMatrixTable(obj.board);
+        setNumOfBombs(obj.bombs);
+        endOfGame(obj.winner);
+        setEvents();
     };
-    xhr.open("post", "PutFlagMinesweeperServlet", true);
+    // xhr.open("put", "CheckMinesweeperServlet");
+    xhr.open("put", "webresources/minesweeper");
     xhr.send(formData);
-    return false;
 }
 function endOfGame(winner) {
     if (winner === "WIN") {
@@ -101,16 +91,16 @@ function newGame() {
     formData.append("rows", rows);
     formData.append("cols", cols);
     formData.append("bombs", bombs);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            let obj = JSON.parse(xhr.responseText);
-            printMatrixTable(obj.board);
-            setNumOfBombs(obj.bombs);
-            setEvents();
-            showMessage("");
-        }
+    xhr.onload = function () {
+        console.log(xhr.responseText);
+        let obj = JSON.parse(xhr.responseText);
+        printMatrixTable(obj.board);
+        setNumOfBombs(obj.bombs);
+        setEvents();
+        showMessage("");
     };
-    xhr.open("post", "CreateMinesweeperServlet");
+    // xhr.open("post", "CreateMinesweeperServlet");
+    xhr.open("post", "webresources/minesweeper");
     xhr.send(formData);
 }
 function init() {
