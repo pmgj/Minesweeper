@@ -1,8 +1,5 @@
 package rest;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class CreateMessage {
     private int rows;
     private int cols;

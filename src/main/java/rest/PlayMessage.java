@@ -1,9 +1,7 @@
 package rest;
 
-import jakarta.xml.bind.annotation.XmlRootElement;
 import model.State;
 
-@XmlRootElement
 public class PlayMessage {
     private int row;
     private int col;

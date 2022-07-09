@@ -1,4 +1,4 @@
-let table, xhr = new XMLHttpRequest(), type = "Servlet";
+let table, xhr = new XMLHttpRequest(), type = "REST";
 let levels = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];
 function printMatrixTable(doc) {
     table = document.querySelector("table");
@@ -53,7 +53,6 @@ function sendData(row, col, state) {
     formData.append("col", col);
     formData.append("state", state);
     xhr.onload = function () {
-        console.log(xhr.responseText);
         let obj = JSON.parse(xhr.responseText);
         printMatrixTable(obj.board);
         setNumOfBombs(obj.bombs);
@@ -98,14 +97,13 @@ function newGame() {
     formData.append("cols", cols);
     formData.append("bombs", bombs);
     xhr.onload = function () {
-        console.log(xhr.responseText);
         let obj = JSON.parse(xhr.responseText);
         printMatrixTable(obj.board);
         setNumOfBombs(obj.bombs);
         setEvents();
         showMessage("");
     };
-    if (type = "Servlet") {
+    if (type == "Servlet") {
         xhr.open("post", "MinesweeperServlet");
         xhr.send(formData);
     } else {

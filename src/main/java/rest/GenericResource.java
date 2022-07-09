@@ -3,8 +3,6 @@ package rest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -22,11 +20,10 @@ public class GenericResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Message play(@Context HttpServletRequest request, @FormParam("row") int row, @FormParam("col") int col,
-            @FormParam("state") String state) {
+    public Message play(@Context HttpServletRequest request, PlayMessage msg) {
         HttpSession session = request.getSession();
         Minesweeper mine = (Minesweeper) session.getAttribute("campo");
-        Winner mr = mine.play(row, col, state.equals("SHOW") ? State.SHOW : State.FLAG);
+        Winner mr = mine.play(msg.getRow(), msg.getCol(), msg.getState() == State.SHOW ? State.SHOW : State.FLAG);
         return new Message(mr, mine.getHiddenMatrix(), mine.getRemainingBombs());
     }
 
@@ -38,11 +35,5 @@ public class GenericResource {
         HttpSession session = request.getSession();
         session.setAttribute("campo", mine);
         return new Message(Winner.NONE, mine.getHiddenMatrix(), mine.getRemainingBombs());
-    }
-
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String test() {
-        return "Funciona";
     }
 }
