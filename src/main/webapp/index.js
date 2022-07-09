@@ -1,4 +1,4 @@
-let table, xhr = new XMLHttpRequest();
+let table, xhr = new XMLHttpRequest(), type = "Servlet";
 let levels = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];
 function printMatrixTable(doc) {
     table = document.querySelector("table");
@@ -60,9 +60,15 @@ function sendData(row, col, state) {
         endOfGame(obj.winner);
         setEvents();
     };
-    // xhr.open("put", "CheckMinesweeperServlet");
-    xhr.open("put", "webresources/minesweeper");
-    xhr.send(formData);
+    if (type == "Servlet") {
+        xhr.open("put", "MinesweeperServlet");
+        xhr.send(formData);
+    } else {
+        xhr.open("put", "webresources/minesweeper");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        let object = formToObj(formData);
+        xhr.send(JSON.stringify(object));
+    }
 }
 function endOfGame(winner) {
     if (winner === "WIN") {
@@ -99,9 +105,20 @@ function newGame() {
         setEvents();
         showMessage("");
     };
-    // xhr.open("post", "CreateMinesweeperServlet");
-    xhr.open("post", "webresources/minesweeper");
-    xhr.send(formData);
+    if (type = "Servlet") {
+        xhr.open("post", "MinesweeperServlet");
+        xhr.send(formData);
+    } else {
+        xhr.open("post", "webresources/minesweeper");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        let object = formToObj(formData);
+        xhr.send(JSON.stringify(object));
+    }
+}
+function formToObj(formData) {
+    let object = {};
+    formData.forEach((value, key) => object[key] = value);
+    return object;
 }
 function init() {
     let button = document.querySelector("input[type='button']");

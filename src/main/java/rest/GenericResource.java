@@ -20,11 +20,10 @@ import servlets.Message;
 public class GenericResource {
 
     @PUT
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Message play(@Context HttpServletRequest request, @FormParam("row") int row, @FormParam("col") int col,
             @FormParam("state") String state) {
-        System.out.println(row);
         HttpSession session = request.getSession();
         Minesweeper mine = (Minesweeper) session.getAttribute("campo");
         Winner mr = mine.play(row, col, state.equals("SHOW") ? State.SHOW : State.FLAG);
@@ -32,12 +31,10 @@ public class GenericResource {
     }
 
     @POST
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Message createMinesweeper(@Context HttpServletRequest request, @FormParam("rows") int rows,
-            @FormParam("cols") int cols, @FormParam("bombs") int bombs) {
-        System.out.println(rows);
-        Minesweeper mine = new Minesweeper(rows, cols, bombs);
+    public Message createMinesweeper(@Context HttpServletRequest request, CreateMessage msg) {
+        Minesweeper mine = new Minesweeper(msg.getRows(), msg.getCols(), msg.getBombs());
         HttpSession session = request.getSession();
         session.setAttribute("campo", mine);
         return new Message(Winner.NONE, mine.getHiddenMatrix(), mine.getRemainingBombs());

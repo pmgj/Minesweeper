@@ -11,12 +11,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.Minesweeper;
-import model.Winner;
 import model.State;
+import model.Winner;
 
 @MultipartConfig
-@WebServlet(name = "CheckMinesweeperServlet", urlPatterns = {"/CheckMinesweeperServlet"})
-public class CheckMinesweeperServlet extends HttpServlet {
+@WebServlet(name = "MinesweeperServlet", urlPatterns = {"/MinesweeperServlet"})
+public class MinesweeperServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String nLinhas = request.getParameter("rows");
+        String nColunas = request.getParameter("cols");
+        String nBombas = request.getParameter("bombs");
+        int rows = Integer.parseInt(nLinhas);
+        int cols = Integer.parseInt(nColunas);
+        int bombs = Integer.parseInt(nBombas);
+        Minesweeper mine = new Minesweeper(rows, cols, bombs);
+        HttpSession session = request.getSession();
+        session.setAttribute("campo", mine);
+        Message m = new Message(Winner.NONE, mine.getHiddenMatrix(), mine.getRemainingBombs());
+        response.addHeader("Content-Type", "application/json");
+        response.getWriter().print(JsonbBuilder.create().toJson(m));
+    }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
