@@ -1,11 +1,8 @@
 package view;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -56,10 +53,6 @@ public class MainWindow extends JFrame {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Square b = new Square();
-                b.setBackground(Color.DARK_GRAY);
-                b.setSize(new Dimension(32, 32));
-                b.setFont(new Font("Arial", Font.PLAIN, 12));
-                b.setMargin(new Insets(0, 0, 0, 0));
                 this.boardPanel.add(b);
                 this.mineField.addObserver(b, i, j);
                 final int x = i, y = j;
@@ -85,9 +78,7 @@ public class MainWindow extends JFrame {
         }
         this.boardPanel.revalidate();
         this.boardPanel.setPreferredSize(new Dimension(32 * cols, 32 * rows));
-
         this.setNumOfBombs(bombs);
-
         this.setDimension();
     }
 
@@ -142,7 +133,7 @@ public class MainWindow extends JFrame {
 
     private void setNumOfBombs(long numOfBombs) {
         if (this.lNumBombs != null) {
-            this.lNumBombs.setText("" + numOfBombs);
+            this.lNumBombs.setText(String.valueOf(numOfBombs));
         }
     }
 
