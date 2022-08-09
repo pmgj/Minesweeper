@@ -72,13 +72,13 @@ function GUI() {
         updateMatrixTable();
     }
     function markBomb(event) {
+        event.preventDefault();
         let cell = event.target;
         let col = cell.cellIndex;
         let row = cell.parentNode.rowIndex;
         cm.play(row, col, State.FLAG);
         updateMatrixTable();
         setNumOfBombs(cm.getNumOfFlags());
-        event.preventDefault();
     }
     function setEvents() {
         table.onclick = check;

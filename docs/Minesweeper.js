@@ -105,7 +105,7 @@ export default class Minesweeper {
             case State.FLAG:
                 if (f.getState() == State.HIDE) {
                     f.setState(State.FLAG);
-                } else {
+                } else if (f.getState() == State.FLAG) {
                     f.setState(State.HIDE);
                 }
                 break;
