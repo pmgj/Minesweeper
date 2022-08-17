@@ -71,7 +71,7 @@ public class MainWindow extends JFrame {
                             default:
                                 break;
                         }
-                        setNumOfBombs(mineField.getNumOfFlags());
+                        setNumOfBombs(mineField.getRemainingBombs());
                     }
                 });
             }

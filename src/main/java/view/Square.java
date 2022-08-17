@@ -43,7 +43,6 @@ public class Square extends JButton implements PropertyChangeListener {
                 icon = new ImageIcon(newimg);
                 this.setIcon(icon);
                 this.setForeground(Color.WHITE);
-                f.setState(State.FLAG);
                 break;
             case SHOW:
                 switch (value) {
@@ -62,7 +61,7 @@ public class Square extends JButton implements PropertyChangeListener {
                         this.setBackground(Color.WHITE);
                         break;
                     default:
-                        text = "" + value.ordinal();
+                        text = String.valueOf(value.ordinal());
                         this.setBackground(Color.WHITE);
                         Color[] colors = { Color.BLUE, Color.GREEN, Color.RED, Color.ORANGE, Color.MAGENTA, Color.PINK,
                                 Color.CYAN, Color.DARK_GRAY };
@@ -73,7 +72,6 @@ public class Square extends JButton implements PropertyChangeListener {
             case HIDE:
                 this.setIcon(null);
                 this.setBackground(Color.DARK_GRAY);
-                f.setState(State.HIDE);
                 break;
         }
         this.setFont(this.getFont().deriveFont(Font.BOLD));
