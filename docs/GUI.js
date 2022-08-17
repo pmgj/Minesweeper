@@ -3,28 +3,30 @@ import Minesweeper from "./Minesweeper.js";
 import State from "./State.js";
 import Winner from "./Winner.js";
 
-function GUI() {
-    let cm = null;
-    let table = null;
-    let difficulties = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];
-    function printMatrixTable() {
-        table = document.querySelector("table");
+class GUI {
+    constructor() {
+        this.cm = null;
+        this.table = null;
+        this.difficulties = [{ name: "Beginner", rows: 9, cols: 9, bombs: 10 }, { name: "Intermediate", rows: 16, cols: 16, bombs: 40 }, { name: "Advanced", rows: 16, cols: 40, bombs: 99 }];    
+    }
+    printMatrixTable() {
+        this.table = document.querySelector("table");
         let inner = "";
-        for (let i = 0; i < cm.getRows(); i++) {
+        for (let i = 0; i < this.cm.getRows(); i++) {
             inner += "<tr>";
-            for (let j = 0; j < cm.getCols(); j++) {
+            for (let j = 0; j < this.cm.getCols(); j++) {
                 inner += "<td class='blocked'></td>";
             }
             inner += "</tr>";
         }
-        table.innerHTML = inner;
+        this.table.innerHTML = inner;
     }
-    function updateMatrixTable() {
-        let hm = cm.getHiddenMatrix();
-        for (let i = 0; i < cm.getRows(); i++) {
-            for (let j = 0; j < cm.getCols(); j++) {
+    updateMatrixTable() {
+        let hm = this.cm.getHiddenMatrix();
+        for (let i = 0; i < this.cm.getRows(); i++) {
+            for (let j = 0; j < this.cm.getCols(); j++) {
                 let square = hm[i][j];
-                let td = table.rows[i].cells[j];
+                let td = this.table.rows[i].cells[j];
                 switch (square.getState()) {
                     case State.FLAG:
                         td.className = "flag";
@@ -53,68 +55,67 @@ function GUI() {
             }
         }
     }
-    function showMessage(msg) {
+    showMessage(msg) {
         let message = document.querySelector("#message");
         message.innerHTML = msg;
     }
-    function check(event) {
+    check(event) {
         let cell = event.target;
         let col = cell.cellIndex;
         let row = cell.parentNode.rowIndex;
-        let m = cm.play(row, col, State.SHOW);
+        let m = this.cm.play(row, col, State.SHOW);
         if (m === Winner.LOSE) {
-            showMessage("You lose! &#9785;");
-            unsetEvents();
+            this.showMessage("You lose! &#9785;");
+            this.unsetEvents();
         } else if (m === Winner.WIN) {
-            showMessage("You win! &#9786;");
-            unsetEvents();
+            this.showMessage("You win! &#9786;");
+            this.unsetEvents();
         }
-        updateMatrixTable();
+        this.updateMatrixTable();
     }
-    function markBomb(event) {
+    markBomb(event) {
         event.preventDefault();
         let cell = event.target;
         let col = cell.cellIndex;
         let row = cell.parentNode.rowIndex;
-        cm.play(row, col, State.FLAG);
-        updateMatrixTable();
-        setNumOfBombs(cm.getNumOfFlags());
+        this.cm.play(row, col, State.FLAG);
+        this.updateMatrixTable();
+        this.setNumOfBombs(this.cm.getNumOfFlags());
     }
-    function setEvents() {
-        table.onclick = check;
-        table.oncontextmenu = markBomb;
+    setEvents() {
+        this.table.onclick = this.check.bind(this);
+        this.table.oncontextmenu = this.markBomb.bind(this);
     }
-    function unsetEvents() {
-        table.onclick = undefined;
-        table.oncontextmenu = undefined;
+    unsetEvents() {
+        this.table.onclick = undefined;
+        this.table.oncontextmenu = undefined;
     }
-    function setNumOfBombs(n) {
+    setNumOfBombs(n) {
         let p = document.querySelector("#numBombs");
         p.textContent = n;
     }
-    function newGame() {
+    newGame() {
         let diff = document.querySelector("#difficulty");
         let value = (diff.value) ? parseInt(diff.value) : 0;
-        let { rows, cols, bombs } = difficulties[value];
-        cm = new Minesweeper(rows, cols, bombs);
-        cm.createMatrix();
-        setNumOfBombs(bombs);
-        printMatrixTable();
-        setEvents();
-        showMessage("");
+        let { rows, cols, bombs } = this.difficulties[value];
+        this.cm = new Minesweeper(rows, cols, bombs);
+        this.cm.createMatrix();
+        this.setNumOfBombs(bombs);
+        this.printMatrixTable();
+        this.setEvents();
+        this.showMessage("");
     }
-    function init() {
+    init() {
         let diff = document.querySelector("#difficulty");
         let str = "";
-        difficulties.forEach((value, i) => {
+        this.difficulties.forEach((value, i) => {
             str += `<option value="${i}">${value.name} (${value.rows} x ${value.cols}, ${value.bombs} bombs)</option>`;
         });
         diff.innerHTML = str;
         let button = document.querySelector("input[type='button']");
-        button.onclick = newGame;
-        newGame();
+        button.onclick = this.newGame.bind(this);
+        this.newGame();
     }
-    return { init };
 }
 let gui = new GUI();
 gui.init();
