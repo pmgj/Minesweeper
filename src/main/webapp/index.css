@@ -1,13 +1,17 @@
-h1, p {
+h1,
+p {
     text-align: center;
 }
+
 p {
     font-size: x-large;
 }
+
 table {
     border-collapse: collapse;
     margin: 0 auto;
 }
+
 td {
     border: 1px solid black;
     width: 30px;
@@ -17,42 +21,65 @@ td {
     text-align: center;
     transition: background-color 1s, color 1s;
 }
+
 .blocked {
     background-color: gray;
 }
+
+.blocked:hover {
+    background-color: lightgray;
+}
+
 .show {
     background-color: white;
     color: black;
     font-weight: bold;
 }
+
 .flag {
     background-color: lightgray;
     color: black;
 }
-.b1, .b2, .b3, .b4, .b5, .b6, .b7, .b8 {
+
+.b1,
+.b2,
+.b3,
+.b4,
+.b5,
+.b6,
+.b7,
+.b8 {
     background-color: white;
 }
+
 .b1 {
     color: blue;
 }
+
 .b2 {
     color: green;
 }
+
 .b3 {
     color: red;
 }
+
 .b4 {
     color: darkblue;
 }
+
 .b5 {
     color: maroon;
 }
+
 .b6 {
     color: orange;
 }
+
 .b7 {
     color: magenta;
 }
+
 .b8 {
     color: salmon;
 }
