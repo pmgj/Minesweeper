@@ -46,7 +46,6 @@ public class MainWindow extends JFrame {
             this.boardPanel.setLayout(new GridLayout(rows, cols));
         } else {
             this.boardPanel = new JPanel(new GridLayout(rows, cols));
-            this.add(boardPanel);
         }
 
         this.mineField = new Minesweeper(rows, cols, bombs);
@@ -99,7 +98,6 @@ public class MainWindow extends JFrame {
         JButton bStart = new JButton("Start");
         bStart.addActionListener(ae -> this.newGame(cbDifficulty));
         optionsPanel.add(bStart);
-        this.add(optionsPanel);
 
         this.newGame(cbDifficulty);
 
@@ -109,7 +107,6 @@ public class MainWindow extends JFrame {
         Difficulty diff = (Difficulty) cbDifficulty.getSelectedItem();
         lNumBombs = new JLabel("" + diff.getBombs());
         bottomPanel.add(lNumBombs);
-        this.add(bottomPanel);
 
         mainPanel.add(optionsPanel);
         mainPanel.add(boardPanel);
