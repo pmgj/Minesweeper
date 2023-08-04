@@ -6,8 +6,11 @@ public class Difficulty {
     protected int cols;
     protected int bombs;
     
-    public Difficulty(String value) {
+    public Difficulty(String value, int rows, int cols, int bombs) {
         this.text = value;
+        this.rows = rows;
+        this.cols = cols;
+        this.bombs = bombs;
     }
 
     public String getText() {
