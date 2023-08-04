@@ -35,7 +35,7 @@ public class Square extends JButton implements PropertyChangeListener {
         ImageIcon icon = null;
         Image img = null, newimg = null;
         switch (state) {
-            case FLAG:
+            case FLAG -> {
                 resource = getClass().getClassLoader().getResource("flag_icon.png");
                 icon = new ImageIcon(resource);
                 img = icon.getImage();
@@ -43,10 +43,10 @@ public class Square extends JButton implements PropertyChangeListener {
                 icon = new ImageIcon(newimg);
                 this.setIcon(icon);
                 this.setForeground(Color.WHITE);
-                break;
-            case SHOW:
+            }
+            case SHOW -> {
                 switch (value) {
-                    case BOMB:
+                    case BOMB -> {
                         resource = getClass().getClassLoader().getResource("bomb_icon.png");
                         icon = new ImageIcon(resource);
                         img = icon.getImage();
@@ -55,24 +55,24 @@ public class Square extends JButton implements PropertyChangeListener {
                         this.setIcon(icon);
                         this.setForeground(Color.black);
                         this.setBackground(Color.lightGray);
-                        break;
-                    case NONE:
+                    }
+                    case NONE -> {
                         text = " ";
                         this.setBackground(Color.WHITE);
-                        break;
-                    default:
+                    }
+                    default -> {
                         text = String.valueOf(value.ordinal());
                         this.setBackground(Color.WHITE);
                         Color[] colors = { Color.BLUE, Color.GREEN, Color.RED, Color.ORANGE, Color.MAGENTA, Color.PINK,
                                 Color.CYAN, Color.DARK_GRAY };
                         this.setForeground(colors[value.ordinal() - 1]);
-                        break;
+                        }
                 }
-                break;
-            case HIDE:
+            }
+            case HIDE -> {
                 this.setIcon(null);
                 this.setBackground(Color.DARK_GRAY);
-                break;
+            }
         }
         this.setFont(this.getFont().deriveFont(Font.BOLD));
         this.setText(text);
