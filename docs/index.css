@@ -1,12 +1,3 @@
-h1,
-p {
-    text-align: center;
-}
-
-p {
-    font-size: x-large;
-}
-
 table {
     border-collapse: collapse;
     margin: 0 auto;
@@ -14,10 +5,11 @@ table {
 
 td {
     border: 1px solid black;
-    width: 30px;
-    min-width: 30px;
-    height: 30px;
-    min-height: 30px;
+    --size: 40px;
+    width: var(--size);
+    min-width: var(--size);
+    height: var(--size);
+    min-height: var(--size);
     text-align: center;
     transition: background-color 1s, color 1s;
 }
